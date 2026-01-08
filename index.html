@@ -3,25 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSI: 元素失竊案 (修復版)</title>
+    <title>CSI: 元素失竊案 (GitHub Fix)</title>
     
     <script>
     window.MathJax = {
       tex: {
         inlineMath: [['$', '$'], ['\\(', '\\)']],
         displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        processEscapes: true
+        processEscapes: true,
+        processEnvironments: true
       },
-      svg: {
-        fontCache: 'global'
-      },
-      startup: {
-        typeset: true /* 強制啟動時渲染 */
+      options: {
+        ignoreHtmlClass: 'tex2jax_ignore',
+        processHtmlClass: 'tex2jax_process'
       }
     };
     </script>
-    
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
     <style>
         :root {
@@ -115,7 +113,6 @@
             width: 150px;
         }
 
-        /* 元素樣式 */
         .flame-grid { display: flex; gap: 10px; margin-top: 10px; }
         .flame-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer; }
         #flame-display { width: 100px; height: 100px; background: #000; margin: 10px 0; border: 1px solid #444; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; color: #555; text-align: center;}
@@ -179,7 +176,7 @@
                 <h3>測試 A: 酸鹼反應</h3>
                 <p>操作：滴入 $0.1\text{M}\ \text{HCl}$。</p>
                 <p>現象：產生大量氣泡。</p>
-                <p><strong>推論：</strong> 含有碳酸鈣 ($CaCO_3$)。</p>
+                <p><strong>推論：</strong> 含有碳酸鈣 ($\text{CaCO}_3$)。</p>
             </div>
 
             <div class="notebook">
@@ -346,7 +343,6 @@
 </div>
 
 <script>
-    // --- 程式邏輯 ---
     let startTime = Date.now();
     setInterval(() => {
         let delta = Math.floor((Date.now() - startTime) / 1000);
