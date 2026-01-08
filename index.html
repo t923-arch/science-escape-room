@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSI: 跨科實驗室謎案 (完整擴充版)</title>
+    <title>CSI: 跨科實驗室謎案 (Math Fix)</title>
+    
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <style>
         :root {
             --bg-color: #0f0f13;
@@ -38,7 +48,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            height: 90vh; /* 固定高度讓內容可滾動 */
+            height: 90vh;
         }
 
         /* 頂部導航 */
@@ -104,22 +114,6 @@
         .flame-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer; }
         #flame-display { width: 100px; height: 100px; background: #000; margin: 10px 0; border: 1px solid #444; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; color: #555; text-align: center;}
         
-        /* L2: 折射計算 */
-        .angle-diagram {
-            width: 300px;
-            height: 150px;
-            border-bottom: 2px solid #fff; /* 介面 */
-            position: relative;
-            margin: 20px auto;
-        }
-        .ray {
-            position: absolute;
-            background: var(--accent-cyan);
-            height: 2px;
-            width: 150px;
-            transform-origin: right center;
-        }
-
         /* L4: DNA 電泳 */
         .dna-gel {
             background: #111;
@@ -181,9 +175,9 @@
             
             <div class="notebook">
                 <h3>測試 A: 酸鹼反應</h3>
-                <p>操作：滴入 0.1M HCl。</p>
+                <p>操作：滴入 $0.1\text{M}\ \text{HCl}$。</p>
                 <p>現象：產生大量氣泡。</p>
-                <p><strong>推論：</strong> 含有碳酸鈣 (CaCO3)。</p>
+                <p><strong>推論：</strong> 含有碳酸鈣 ($CaCO_3$)。</p>
             </div>
 
             <div class="notebook">
@@ -238,8 +232,8 @@
             
             <div class="hint-toggle" onclick="toggleHint('hint-2')">💡 覺得卡住了？點此顯示計算提示</div>
             <div id="hint-2" class="hint-content">
-                $1 \times 0.8 = n_2 \times 0.6$ <br>
-                $n_2 = 0.8 / 0.6 = ?$
+                $$1 \times 0.8 = n_2 \times 0.6$$
+                $$n_2 = \frac{0.8}{0.6} = ?$$
             </div>
 
             <button class="btn" onclick="checkScene2()">注入液體</button>
@@ -335,8 +329,8 @@
                 <hr>
                 <p><strong>回顧重點：</strong></p>
                 <ol>
-                    <li>[化] 焰色試驗 Na = 黃色。</li>
-                    <li>[物] 司乃耳定律計算 $n = \sin53^\circ / \sin37^\circ \approx 1.33$。</li>
+                    <li>[化] 焰色試驗 $Na$ = 黃色。</li>
+                    <li>[物] 司乃耳定律 $n = \frac{\sin53^\circ}{\sin37^\circ} \approx 1.33$。</li>
                     <li>[物] 拍頻原理 $f_{beat} = |f_1 - f_2|$。</li>
                     <li>[生] DNA 電泳圖譜的唯一性。</li>
                 </ol>
@@ -381,7 +375,6 @@
 
     function checkScene1() {
         let ans = document.getElementById('ans-1').value;
-        // Na 是黃色，對應 B區
         if(ans === 'B') {
             alert('推論正確！樣本含有鈉離子(黃色火焰)，目標鎖定 B區實驗室。');
             gotoScene(2);
@@ -393,8 +386,6 @@
     // --- Scene 2 Logic ---
     function checkScene2() {
         let ans = parseFloat(document.getElementById('ans-2').value);
-        // 1 * 0.8 = n * 0.6 => n = 1.333...
-        // 接受 1.33
         if(ans >= 1.32 && ans <= 1.34) {
             alert('折射率正確！液體調配成功，雷射擊中感應點。');
             gotoScene(3);
@@ -409,7 +400,6 @@
         let b2 = parseInt(document.getElementById('beat-2').value);
         let b3 = parseInt(document.getElementById('beat-3').value);
 
-        // Answers: 4, 7, 5
         if(b1 === 4 && b2 === 7 && b3 === 5) {
             alert('聲紋密碼正確！保險箱開啟。');
             gotoScene(4);
@@ -421,7 +411,6 @@
     // --- Scene 4 Logic ---
     function checkScene4() {
         let ans = document.getElementById('ans-4').value;
-        // S3 is the match (A type + correct bands)
         if(ans === 'S3') {
             document.getElementById('final-time').innerText = document.getElementById('timer').innerText;
             gotoScene(5);
@@ -433,7 +422,6 @@
             alert('請選擇一位嫌疑人。');
         }
     }
-
 </script>
 
 </body>
