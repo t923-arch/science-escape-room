@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSI: 跨科實驗室謎案 (完整擴充版)</title>
+    <style>
+        :root {
+            --bg-color: #0f0f13;
+            --panel-bg: #1a1a20;
+            --accent-cyan: #00e5ff;
+            --accent-green: #00ff9d;
+            --accent-yellow: #ffea00;
+            --text-main: #d1d1d1;
+            --border-color: #333;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        #game-wrapper {
+            width: 900px;
+            max-width: 95vw;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 90vh; /* 固定高度讓內容可滾動 */
+        }
+
+        /* 頂部導航 */
+        header {
+            background: #000;
+            padding: 15px 20px;
+            border-bottom: 2px solid var(--accent-cyan);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        h1 { margin: 0; font-size: 1.2rem; color: var(--accent-cyan); letter-spacing: 1px; }
+
+        /* 內容滾動區 */
+        #content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+        }
+
+        .scene { display: none; animation: fadeIn 0.5s ease; }
+        .scene.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 元件樣式 */
+        .notebook {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--accent-yellow);
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 0.95rem;
+        }
+        .notebook h3 { margin-top: 0; color: var(--accent-yellow); }
+
+        .btn {
+            background: linear-gradient(135deg, #006064, #0097a7);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.2s;
+            margin-top: 15px;
+            display: inline-block;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,229,255,0.3); }
+
+        input[type="text"], input[type="number"] {
+            background: #222;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            width: 150px;
+        }
+
+        /* L1: 焰色試驗 */
+        .flame-grid { display: flex; gap: 10px; margin-top: 10px; }
+        .flame-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer; }
+        #flame-display { width: 100px; height: 100px; background: #000; margin: 10px 0; border: 1px solid #444; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; color: #555; text-align: center;}
+        
+        /* L2: 折射計算 */
+        .angle-diagram {
+            width: 300px;
+            height: 150px;
+            border-bottom: 2px solid #fff; /* 介面 */
+            position: relative;
+            margin: 20px auto;
+        }
+        .ray {
+            position: absolute;
+            background: var(--accent-cyan);
+            height: 2px;
+            width: 150px;
+            transform-origin: right center;
+        }
+
+        /* L4: DNA 電泳 */
+        .dna-gel {
+            background: #111;
+            border: 2px solid #444;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            height: 200px;
+        }
+        .lane {
+            width: 40px;
+            background: #222;
+            position: relative;
+        }
+        .band {
+            width: 100%;
+            height: 4px;
+            background: var(--accent-cyan);
+            position: absolute;
+            box-shadow: 0 0 5px var(--accent-cyan);
+        }
+
+        /* 提示區 */
+        .hint-toggle {
+            color: #666;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            margin-top: 10px;
+        }
+        .hint-content { display: none; color: #888; font-size: 0.9rem; margin-top: 5px; }
+
+    </style>
+</head>
+<body>
+
+<div id="game-wrapper">
+    <header>
+        <h1>🧪 CSI: 元素失竊案</h1>
+        <div style="font-size: 0.9rem;">時間: <span id="timer">00:00</span></div>
+    </header>
+
+    <div id="content-area">
+        
+        <div id="scene-0" class="scene active">
+            <h2>📁 案件編號 404：消失的「量子晶體」</h2>
+            <div class="notebook">
+                <h3>[案情摘要]</h3>
+                <p>時間：2026/01/08 凌晨 02:00<br>地點：中央科學館<br>失物：極不穩定的能源核心「量子晶體」。</p>
+                <p>警方封鎖了現場，發現犯人非常謹慎，但仍在匆忙中留下了微量痕跡。作為鑑識科學實習生，你需要運用物理、化學、生物知識，在 35 分鐘內找出真凶並找回晶體。</p>
+            </div>
+            <p>請仔細閱讀每一步的數據，任何錯誤都可能導致證據損毀。</p>
+            <button class="btn" onclick="gotoScene(1)">進入現場 (Scene 1)</button>
+        </div>
+
+        <div id="scene-1" class="scene">
+            <h2>Scene 1: 泥土與火焰</h2>
+            <p>在窗框上發現了不明粉末。你需要進行兩項測試來鎖定來源。</p>
+            
+            <div class="notebook">
+                <h3>測試 A: 酸鹼反應</h3>
+                <p>操作：滴入 0.1M HCl。</p>
+                <p>現象：產生大量氣泡。</p>
+                <p><strong>推論：</strong> 含有碳酸鈣 (CaCO3)。</p>
+            </div>
+
+            <div class="notebook">
+                <h3>測試 B: 焰色試驗 (Flame Test)</h3>
+                <p>操作：沾取粉末進行酒精燈燃燒。</p>
+                <p>請點擊下方元素，觀察火焰顏色，找出與現場樣本 (亮黃色) 相符的金屬。</p>
+            </div>
+
+            <div class="flame-grid">
+                <button class="flame-btn" style="background:#ff3333" onclick="showFlame('Li', '紅色')">Li</button>
+                <button class="flame-btn" style="background:#ccaaff" onclick="showFlame('K', '紫色')">K</button>
+                <button class="flame-btn" style="background:#ffee00" onclick="showFlame('Na', '亮黃色')">Na</button>
+                <button class="flame-btn" style="background:#00ff00" onclick="showFlame('Cu', '綠色')">Cu</button>
+                <button class="flame-btn" style="background:#ff8800" onclick="showFlame('Ca', '磚紅色')">Ca</button>
+            </div>
+            <div id="flame-display">請選擇元素</div>
+
+            <hr style="border-color:#333; margin: 20px 0;">
+
+            <p><strong>[實驗室分區表]</strong></p>
+            <ul>
+                <li>A區 (Li): 鋰電池研發室</li>
+                <li>B區 (Na): 海水淡化實驗室</li>
+                <li>C區 (Cu): 超導體實驗室</li>
+            </ul>
+
+            <p>根據酸鹼反應(地質特徵)與焰色結果(微量金屬)，犯人去過哪裡？</p>
+            <select id="ans-1">
+                <option value="">選擇區域</option>
+                <option value="A">A區 (鋰)</option>
+                <option value="B">B區 (鈉)</option>
+                <option value="C">C區 (銅)</option>
+            </select>
+            <button class="btn" onclick="checkScene1()">確認地點</button>
+        </div>
+
+        <div id="scene-2" class="scene">
+            <h2>Scene 2: 光的路徑</h2>
+            <p>你來到了 B區實驗室。門鎖是一個光學感應裝置。必須調配出正確折射率 ($n$) 的液體注入槽中，使雷射光精準射中感應點。</p>
+            
+            <div class="notebook">
+                <h3>[實驗數據]</h3>
+                <p>入射角 ($\theta_1$): $53^\circ$ (空氣中, $n_1 \approx 1$)</p>
+                <p>折射角 ($\theta_2$): $37^\circ$ (未知液體中, $n_2$)</p>
+                <p><strong>[公式提示] 司乃耳定律 (Snell's Law):</strong></p>
+                <p>$$n_1 \cdot \sin\theta_1 = n_2 \cdot \sin\theta_2$$</p>
+                <p>已知: $\sin 53^\circ \approx 0.8$, $\sin 37^\circ \approx 0.6$</p>
+            </div>
+
+            <p>請計算液體折射率 $n_2$ (取小數點後兩位)：</p>
+            <input type="number" id="ans-2" step="0.01" placeholder="例如: 1.50">
+            
+            <div class="hint-toggle" onclick="toggleHint('hint-2')">💡 覺得卡住了？點此顯示計算提示</div>
+            <div id="hint-2" class="hint-content">
+                $1 \times 0.8 = n_2 \times 0.6$ <br>
+                $n_2 = 0.8 / 0.6 = ?$
+            </div>
+
+            <button class="btn" onclick="checkScene2()">注入液體</button>
+        </div>
+
+        <div id="scene-3" class="scene">
+            <h2>Scene 3: 聽見頻率</h2>
+            <p>門打開了。保險箱上有一個聲波產生器。密碼是一組數字，提示寫著：「當兩個頻率相近的聲音同時播放，每秒聽到的強弱變化次數 (拍頻) 即為密碼」。</p>
+
+            <div class="notebook">
+                <h3>[聲波數據]</h3>
+                <p>基準音頻 $f_1 = 440 \text{ Hz}$</p>
+                <p>目標音頻 $f_2 = 444 \text{ Hz}$</p>
+                <p><strong>公式：</strong> 拍頻頻率 $f_{beat} = |f_1 - f_2|$</p>
+            </div>
+
+            <div style="background: #222; padding: 15px; border-radius: 5px;">
+                <p>第一組密碼：$f_1 = 440$, $f_2 = 444$。拍頻是？</p>
+                <input type="number" id="beat-1" style="width:50px">
+                
+                <p>第二組密碼：$f_1 = 1000$, $f_2 = 1007$。拍頻是？</p>
+                <input type="number" id="beat-2" style="width:50px">
+
+                <p>第三組密碼：$f_1 = 256$, $f_2 = 251$。拍頻是？</p>
+                <input type="number" id="beat-3" style="width:50px">
+            </div>
+
+            <button class="btn" onclick="checkScene3()">輸入密碼</button>
+        </div>
+
+        <div id="scene-4" class="scene">
+            <h2>Scene 4: 雙重驗證</h2>
+            <p>保險箱開啟，你找到了嫌疑犯遺留的生物樣本。為了確保萬無一失，必須進行「血型快篩」與「DNA 凝膠電泳」雙重比對。</p>
+
+            <div class="notebook">
+                <h3>[證據 1: 血型測試]</h3>
+                <p>現場樣本對 Anti-A 凝集，對 Anti-B 無反應。</p>
+                <p>推論：現場樣本為 <strong>A型</strong> 血。</p>
+            </div>
+
+            <div class="notebook">
+                <h3>[證據 2: DNA 電泳圖]</h3>
+                <p>現場樣本的 DNA 切割片段長度分佈如下。請找出與證據完全匹配的嫌疑人。</p>
+            </div>
+
+            <div class="dna-gel">
+                <div class="lane">
+                    <div style="color:#fff; text-align:center; font-size:0.8rem">證據</div>
+                    <div class="band" style="top: 20px;"></div>
+                    <div class="band" style="top: 80px;"></div>
+                    <div class="band" style="top: 150px;"></div>
+                </div>
+                <div class="lane">
+                    <div style="color:#666; text-align:center; font-size:0.8rem">S1(O型)</div>
+                    <div class="band" style="top: 20px;"></div>
+                    <div class="band" style="top: 90px;"></div> </div>
+                <div class="lane">
+                    <div style="color:#666; text-align:center; font-size:0.8rem">S2(A型)</div>
+                    <div class="band" style="top: 30px;"></div> <div class="band" style="top: 80px;"></div>
+                </div>
+                <div class="lane">
+                    <div style="color:#666; text-align:center; font-size:0.8rem">S3(A型)</div>
+                    <div class="band" style="top: 20px;"></div>
+                    <div class="band" style="top: 80px;"></div>
+                    <div class="band" style="top: 150px;"></div>
+                </div>
+            </div>
+
+            <hr>
+            <p><strong>[嫌疑人名單]</strong></p>
+            <ul>
+                <li>S1 (Dr. Strange): O型，物理學家。</li>
+                <li>S2 (Dr. Banner): A型，化學家。</li>
+                <li>S3 (Dr. Pym): A型，量子力學家。</li>
+            </ul>
+
+            <p>兇手是誰？</p>
+            <select id="ans-4">
+                <option value="">-- 指認兇手 --</option>
+                <option value="S1">S1</option>
+                <option value="S2">S2</option>
+                <option value="S3">S3</option>
+            </select>
+            
+            <button class="btn" onclick="checkScene4()">提交結案報告</button>
+        </div>
+
+        <div id="scene-5" class="scene">
+            <h2 style="color:var(--accent-green)">🎉 案件偵破 (Case Closed)</h2>
+            <div class="notebook">
+                <p>恭喜！你成功找回了量子晶體。</p>
+                <p>本次耗時: <span id="final-time"></span></p>
+                <hr>
+                <p><strong>回顧重點：</strong></p>
+                <ol>
+                    <li>[化] 焰色試驗 Na = 黃色。</li>
+                    <li>[物] 司乃耳定律計算 $n = \sin53^\circ / \sin37^\circ \approx 1.33$。</li>
+                    <li>[物] 拍頻原理 $f_{beat} = |f_1 - f_2|$。</li>
+                    <li>[生] DNA 電泳圖譜的唯一性。</li>
+                </ol>
+            </div>
+            <button class="btn" onclick="location.reload()">重新挑戰</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // --- 計時器 ---
+    let startTime = Date.now();
+    setInterval(() => {
+        let delta = Math.floor((Date.now() - startTime) / 1000);
+        let m = Math.floor(delta / 60).toString().padStart(2, '0');
+        let s = (delta % 60).toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `${m}:${s}`;
+    }, 1000);
+
+    // --- 場景切換 ---
+    function gotoScene(n) {
+        document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+        document.getElementById('scene-' + n).classList.add('active');
+        document.getElementById('content-area').scrollTop = 0;
+    }
+
+    function toggleHint(id) {
+        let el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+
+    // --- Scene 1 Logic ---
+    function showFlame(element, colorName) {
+        let display = document.getElementById('flame-display');
+        display.innerText = `${element} : ${colorName}`;
+        display.style.color = colorName === '亮黃色' ? '#ffee00' : 
+                              colorName === '紅色' ? '#ff3333' : 
+                              colorName === '紫色' ? '#ccaaff' :
+                              colorName === '綠色' ? '#00ff00' : '#ff8800';
+    }
+
+    function checkScene1() {
+        let ans = document.getElementById('ans-1').value;
+        // Na 是黃色，對應 B區
+        if(ans === 'B') {
+            alert('推論正確！樣本含有鈉離子(黃色火焰)，目標鎖定 B區實驗室。');
+            gotoScene(2);
+        } else {
+            alert('推論錯誤。提示：現場樣本火焰為「亮黃色」，請對照元素週期表常識或測試結果。');
+        }
+    }
+
+    // --- Scene 2 Logic ---
+    function checkScene2() {
+        let ans = parseFloat(document.getElementById('ans-2').value);
+        // 1 * 0.8 = n * 0.6 => n = 1.333...
+        // 接受 1.33
+        if(ans >= 1.32 && ans <= 1.34) {
+            alert('折射率正確！液體調配成功，雷射擊中感應點。');
+            gotoScene(3);
+        } else {
+            alert('計算錯誤。雷射偏離目標。請檢查 n = sin(53) / sin(37)。');
+        }
+    }
+
+    // --- Scene 3 Logic ---
+    function checkScene3() {
+        let b1 = parseInt(document.getElementById('beat-1').value);
+        let b2 = parseInt(document.getElementById('beat-2').value);
+        let b3 = parseInt(document.getElementById('beat-3').value);
+
+        // Answers: 4, 7, 5
+        if(b1 === 4 && b2 === 7 && b3 === 5) {
+            alert('聲紋密碼正確！保險箱開啟。');
+            gotoScene(4);
+        } else {
+            alert('密碼錯誤。記得拍頻是兩個頻率的差值 (絕對值)。');
+        }
+    }
+
+    // --- Scene 4 Logic ---
+    function checkScene4() {
+        let ans = document.getElementById('ans-4').value;
+        // S3 is the match (A type + correct bands)
+        if(ans === 'S3') {
+            document.getElementById('final-time').innerText = document.getElementById('timer').innerText;
+            gotoScene(5);
+        } else if (ans === 'S1') {
+            alert('錯誤。S1 是 O型血，與現場 A型血不符 (抗原測試已排除)。');
+        } else if (ans === 'S2') {
+            alert('錯誤。雖然 S2 是 A型血，但 DNA 電泳條帶位置與現場證據不符。');
+        } else {
+            alert('請選擇一位嫌疑人。');
+        }
+    }
+
+</script>
+
+</body>
+</html>
