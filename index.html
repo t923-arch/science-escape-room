@@ -6,31 +6,15 @@
     <title>CSI: 元素失竊案 (GitHub Fix)</title>
     
     <script>
-    
-    MathJax = {
+      window.MathJax = {
         tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']], // 讓單個 $ 也能顯示數學符號
-        displayMath: [['$$', '$$'], ['\\[', '\\]']]
-    }
-  };
-    </script>
-<script id="MathJax-script" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
-    window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        processEscapes: true,
-        processEnvironments: true
-      },
-      options: {
-        ignoreHtmlClass: 'tex2jax_ignore',
-        processHtmlClass: 'tex2jax_process'
-      }
-    };
+          inlineMath: [['$', '$'], ['\\(', '\\)']], // 開啟單個 $ 符號功能
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true
+        }
+      };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-
     <style>
         :root {
             --bg-color: #0f0f13;
@@ -157,6 +141,7 @@
         }
         .hint-content { display: none; color: #888; font-size: 0.9rem; margin-top: 5px; }
     </style>
+
 </head>
 <body>
 
