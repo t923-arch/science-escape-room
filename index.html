@@ -3,16 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSI: 跨科實驗室謎案 (Math Fix)</title>
+    <title>CSI: 元素失竊案 (修復版)</title>
     
     <script>
     window.MathJax = {
       tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']]
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      },
+      startup: {
+        typeset: true /* 強制啟動時渲染 */
       }
     };
     </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
     <style>
         :root {
@@ -51,7 +60,6 @@
             height: 90vh;
         }
 
-        /* 頂部導航 */
         header {
             background: #000;
             padding: 15px 20px;
@@ -63,7 +71,6 @@
         }
         h1 { margin: 0; font-size: 1.2rem; color: var(--accent-cyan); letter-spacing: 1px; }
 
-        /* 內容滾動區 */
         #content-area {
             flex-grow: 1;
             overflow-y: auto;
@@ -75,7 +82,6 @@
         .scene.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 元件樣式 */
         .notebook {
             background: rgba(255, 255, 255, 0.05);
             border-left: 4px solid var(--accent-yellow);
@@ -109,12 +115,11 @@
             width: 150px;
         }
 
-        /* L1: 焰色試驗 */
+        /* 元素樣式 */
         .flame-grid { display: flex; gap: 10px; margin-top: 10px; }
         .flame-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; cursor: pointer; }
         #flame-display { width: 100px; height: 100px; background: #000; margin: 10px 0; border: 1px solid #444; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; color: #555; text-align: center;}
         
-        /* L4: DNA 電泳 */
         .dna-gel {
             background: #111;
             border: 2px solid #444;
@@ -136,7 +141,6 @@
             box-shadow: 0 0 5px var(--accent-cyan);
         }
 
-        /* 提示區 */
         .hint-toggle {
             color: #666;
             cursor: pointer;
@@ -145,7 +149,6 @@
             margin-top: 10px;
         }
         .hint-content { display: none; color: #888; font-size: 0.9rem; margin-top: 5px; }
-
     </style>
 </head>
 <body>
@@ -165,7 +168,6 @@
                 <p>時間：2026/01/08 凌晨 02:00<br>地點：中央科學館<br>失物：極不穩定的能源核心「量子晶體」。</p>
                 <p>警方封鎖了現場，發現犯人非常謹慎，但仍在匆忙中留下了微量痕跡。作為鑑識科學實習生，你需要運用物理、化學、生物知識，在 35 分鐘內找出真凶並找回晶體。</p>
             </div>
-            <p>請仔細閱讀每一步的數據，任何錯誤都可能導致證據損毀。</p>
             <button class="btn" onclick="gotoScene(1)">進入現場 (Scene 1)</button>
         </div>
 
@@ -204,7 +206,7 @@
                 <li>C區 (Cu): 超導體實驗室</li>
             </ul>
 
-            <p>根據酸鹼反應(地質特徵)與焰色結果(微量金屬)，犯人去過哪裡？</p>
+            <p>根據酸鹼反應與焰色結果，犯人去過哪裡？</p>
             <select id="ans-1">
                 <option value="">選擇區域</option>
                 <option value="A">A區 (鋰)</option>
@@ -289,10 +291,12 @@
                 <div class="lane">
                     <div style="color:#666; text-align:center; font-size:0.8rem">S1(O型)</div>
                     <div class="band" style="top: 20px;"></div>
-                    <div class="band" style="top: 90px;"></div> </div>
+                    <div class="band" style="top: 90px;"></div>
+                </div>
                 <div class="lane">
                     <div style="color:#666; text-align:center; font-size:0.8rem">S2(A型)</div>
-                    <div class="band" style="top: 30px;"></div> <div class="band" style="top: 80px;"></div>
+                    <div class="band" style="top: 30px;"></div>
+                    <div class="band" style="top: 80px;"></div>
                 </div>
                 <div class="lane">
                     <div style="color:#666; text-align:center; font-size:0.8rem">S3(A型)</div>
@@ -342,7 +346,7 @@
 </div>
 
 <script>
-    // --- 計時器 ---
+    // --- 程式邏輯 ---
     let startTime = Date.now();
     setInterval(() => {
         let delta = Math.floor((Date.now() - startTime) / 1000);
@@ -351,7 +355,6 @@
         document.getElementById('timer').innerText = `${m}:${s}`;
     }, 1000);
 
-    // --- 場景切換 ---
     function gotoScene(n) {
         document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
         document.getElementById('scene-' + n).classList.add('active');
@@ -363,7 +366,6 @@
         el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
-    // --- Scene 1 Logic ---
     function showFlame(element, colorName) {
         let display = document.getElementById('flame-display');
         display.innerText = `${element} : ${colorName}`;
@@ -383,7 +385,6 @@
         }
     }
 
-    // --- Scene 2 Logic ---
     function checkScene2() {
         let ans = parseFloat(document.getElementById('ans-2').value);
         if(ans >= 1.32 && ans <= 1.34) {
@@ -394,7 +395,6 @@
         }
     }
 
-    // --- Scene 3 Logic ---
     function checkScene3() {
         let b1 = parseInt(document.getElementById('beat-1').value);
         let b2 = parseInt(document.getElementById('beat-2').value);
@@ -408,7 +408,6 @@
         }
     }
 
-    // --- Scene 4 Logic ---
     function checkScene4() {
         let ans = document.getElementById('ans-4').value;
         if(ans === 'S3') {
